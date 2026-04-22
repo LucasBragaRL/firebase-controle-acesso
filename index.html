@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Firebase App</title>
+</head>
+<body>
+
+  <h2>Cadastro / Login</h2>
+
+  <input id="email" placeholder="Email"><br><br>
+  <input id="senha" type="password" placeholder="Senha"><br><br>
+
+  <button onclick="registrar()">Registrar</button>
+  <button onclick="login()">Login</button>
+
+  <h3 id="status"></h3>
+
+  <!-- NOVA ÁREA -->
+  <div id="adminArea"></div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import { getDatabase, ref, set, get } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDtfF0wI24sYp-9GYQspeohK5kviuScCkQ",
+      authDomain: "trabalho-modelagem-de-dados.firebaseapp.com",
+      databaseURL: "https://trabalho-modelagem-de-dados-default-rtdb.firebaseio.com",
+      projectId: "trabalho-modelagem-de-dados",
+      storageBucket: "trabalho-modelagem-de-dados.firebasestorage.app",
+      messagingSenderId: "644358845197",
+      appId: "1:644358845197:web:40196046c04e4dd2acb644"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth();
+    const db = getDatabase();
+
+    window.registrar = function() {
+      const email = document.getElementById("email").value;
+      const senha = document.getElementById("senha").value;
+
+      createUserWithEmailAndPassword(auth, email, senha)
+        .then((userCredential) => {
+          const user = userCredential.user;
+
+          set(ref(db, 'users/' + user.uid), {
+            email: email,
+            role: "user"
+          });
+
+          document.getElementById("status").innerText = "Registrado!";
+        })
+        .catch((error) => {
+          document.getElementById("status").innerText = error.message;
+        });
+    }
+
+    window.login = function() {
+      const email = document.getElementById("email").value;
+      const senha = document.getElementById("senha").value;
+
+      signInWithEmailAndPassword(auth, email, senha)
+        .then((userCredential) => {
+          const user = userCredential.user;
+
+          get(ref(db, 'users/' + user.uid)).then(snapshot => {
+            const data = snapshot.val();
+
+            if (data.role === "admin") {
+              document.getElementById("status").innerText = "Logado como ADMIN";
+
+              get(ref(db, 'admin-data')).then(snap => {
+                document.getElementById("adminArea").innerText =
+                  "Dado secreto: " + JSON.stringify(snap.val());
+              });
+
+            } else {
+              document.getElementById("status").innerText = "Logado como USER";
+              document.getElementById("adminArea").innerText =
+                "Você não tem acesso aos dados de admin";
+            }
+          });
+        })
+        .catch((error) => {
+          document.getElementById("status").innerText = error.message;
+        });
+    }
+  </script>
+
+</body>
+</html>
