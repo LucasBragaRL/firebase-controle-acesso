@@ -15,7 +15,6 @@
 
   <h3 id="status"></h3>
 
-  <!-- NOVA ÁREA -->
   <div id="adminArea"></div>
 
   <script type="module">
@@ -24,18 +23,18 @@
     import { getDatabase, ref, set, get } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
     const firebaseConfig = {
-      apiKey: "AIzaSyDtfF0wI24sYp-9GYQspeohK5kviuScCkQ",
-      authDomain: "trabalho-modelagem-de-dados.firebaseapp.com",
-      databaseURL: "https://trabalho-modelagem-de-dados-default-rtdb.firebaseio.com",
-      projectId: "trabalho-modelagem-de-dados",
-      storageBucket: "trabalho-modelagem-de-dados.firebasestorage.app",
-      messagingSenderId: "644358845197",
-      appId: "1:644358845197:web:40196046c04e4dd2acb644"
+      apiKey: "AIzaSyAws2ox9u_7aC4csLePlYgQENGGhiItPjE",
+      authDomain: "fir-controle-acesso.firebaseapp.com",
+      databaseURL: "https://fir-controle-acesso-default-rtdb.firebaseio.com",
+      projectId: "fir-controle-acesso",
+      storageBucket: "fir-controle-acesso.firebasestorage.app",
+      messagingSenderId: "169728390143",
+      appId: "1:169728390143:web:c7b039d2f9f7e0be68adca"
     };
 
     const app = initializeApp(firebaseConfig);
-    const auth = getAuth();
-    const db = getDatabase();
+    const auth = getAuth(app);
+    const db = getDatabase(app);
 
     window.registrar = function() {
       const email = document.getElementById("email").value;
@@ -68,7 +67,7 @@
           get(ref(db, 'users/' + user.uid)).then(snapshot => {
             const data = snapshot.val();
 
-            if (data.role === "admin") {
+            if (data && data.role === "admin") {
               document.getElementById("status").innerText = "Logado como ADMIN";
 
               get(ref(db, 'admin-data')).then(snap => {
